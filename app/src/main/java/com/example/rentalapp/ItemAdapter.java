@@ -2,6 +2,7 @@ package com.example.rentalapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,8 +37,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         holder.bookPrice.setText(String.format("%.2f", item.getPrice()));
 
         holder.itemView.setOnClickListener(v -> {
+            Log.d("ItemAdapter", "ITEM_ID passed: " + item.getId());
             Intent intent = new Intent(context, ProductDetailActivity.class);
-            intent.putExtra("ITEM_ID", item.getId()); // Pass the item ID to the ProductDetailActivity
+            intent.putExtra("ITEM_ID", String.valueOf(item.getId())); // Pass as String
             context.startActivity(intent);
         });
     }

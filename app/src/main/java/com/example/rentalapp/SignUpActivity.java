@@ -98,7 +98,12 @@ public class SignUpActivity extends AppCompatActivity {
                     Toast.makeText(SignUpActivity.this, "Signup Successful!", Toast.LENGTH_SHORT).show();
                     // Handle token or move to login screen
                 } else {
-                    Toast.makeText(SignUpActivity.this, "Signup Failed", Toast.LENGTH_SHORT).show();
+                    try {
+                        String errorBody = response.errorBody().string();
+                        Toast.makeText(SignUpActivity.this, errorBody, Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        Toast.makeText(SignUpActivity.this, "Signup Failed: " + response.code(), Toast.LENGTH_LONG).show();
+                    }
                 }
             }
 

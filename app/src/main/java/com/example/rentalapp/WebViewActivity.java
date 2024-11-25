@@ -5,33 +5,31 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import androidx.annotation.Nullable;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 public class WebViewActivity extends AppCompatActivity {
 
-    private static final String EXTRA_PAYMENT_URL = "PAYMENT_URL";
+    private static final String EXTRA_URL = "URL";
 
-    public static void start(Context context, String paymentUrl) {
+    public static void start(Context context, String url) {
         Intent intent = new Intent(context, WebViewActivity.class);
-        intent.putExtra(EXTRA_PAYMENT_URL, paymentUrl);
+        intent.putExtra(EXTRA_URL, url);
         context.startActivity(intent);
     }
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_webview);
-
-        String paymentUrl = getIntent().getStringExtra(EXTRA_PAYMENT_URL);
-        if (paymentUrl == null) {
-            finish();
-            return;
-        }
 
         WebView webView = findViewById(R.id.web_view);
         webView.setWebViewClient(new WebViewClient());
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadUrl(paymentUrl);
+
+        String url = getIntent().getStringExtra(EXTRA_URL);
+        if (url != null) {
+            webView.loadUrl(url);
+        }
     }
 }

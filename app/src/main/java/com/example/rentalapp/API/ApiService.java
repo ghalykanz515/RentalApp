@@ -27,7 +27,7 @@ public interface ApiService {
     Call<List<Item>> getItems(@Header("Authorization") String token);
 
     @GET("items/{id}")
-    Call<Item> getItemDetails(@Path("id") String id);
+    Call<Item> getItemDetails(@Header("Authorization") String token, @Path("id") String itemId);
 
     @POST("rent/item/{id}")
     Call<ResponseBody> initiateRent(
