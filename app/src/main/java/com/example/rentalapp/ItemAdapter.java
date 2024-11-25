@@ -1,5 +1,7 @@
 package com.example.rentalapp;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +14,11 @@ import java.util.List;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder> {
     private List<Item> itemList;
+    private Context context;
 
-    public ItemAdapter(List<Item> itemList) {
+    public ItemAdapter(List<Item> itemList, Context context) {
         this.itemList = itemList;
+        this.context = context;
     }
 
     @NonNull
@@ -30,6 +34,12 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         holder.bookName.setText(item.getName());
         holder.categoryBadge.setText(item.getCategory());
         holder.bookPrice.setText(String.format("%.2f", item.getPrice()));
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ProductDetailActivity.class);
+            intent.putExtra("ITEM_ID", item.getId()); // Pass the item ID to the ProductDetailActivity
+            context.startActivity(intent);
+        });
     }
 
     @Override

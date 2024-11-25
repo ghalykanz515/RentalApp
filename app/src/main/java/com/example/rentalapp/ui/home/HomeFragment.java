@@ -40,40 +40,6 @@ public class HomeFragment extends Fragment {
     private ViewPager2 bannerViewPager;
     private CircleIndicator3 bannerIndicator;
 
-//    public View onCreateView(@NonNull LayoutInflater inflater,
-//                             ViewGroup container, Bundle savedInstanceState) {
-//        HomeViewModel homeViewModel =
-//                new ViewModelProvider(this).get(HomeViewModel.class);
-//
-//        binding = FragmentHomeBinding.inflate(inflater, container, false);
-//        View root = binding.getRoot();
-//
-//        // Initialize Views
-//        bannerViewPager = binding.bannerViewPager;
-//        bannerIndicator = binding.bannerIndicator;
-//        RecyclerView recyclerView = binding.recyclerView;
-//
-//        // Set up the banner
-//        setupBanner();
-//
-//        // Set up RecyclerView with GridLayoutManager (2 columns)
-//        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
-//        recyclerView.setLayoutManager(gridLayoutManager);
-//
-//        // Initialize item list and add sample data
-//        itemList = new ArrayList<>();
-//        itemList.add(new Item("Sherlock Homes", "Novel", "Test", 100.00, 5, "available", 1));
-//        itemList.add(new Item("Germany For Beginners", "Education", "Test", 100.00, 5, "available", 1));
-//        itemList.add(new Item("Doraemon #81", "Comic", "Test", 100.00, 5, "available", 1));
-//        itemList.add(new Item("Principles Of Physics", "Education", "Test", 100.00, 5, "available", 1));
-//        // Add more items as needed...
-//
-//        itemAdapter = new ItemAdapter(itemList);
-//        recyclerView.setAdapter(itemAdapter);
-//
-//        return root;
-//    }
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -104,7 +70,7 @@ public class HomeFragment extends Fragment {
             return root;
         }
 
-        // Make the API call to get items
+        // Make the API call to get items with the cards
         String currentToken = "Bearer " + token;
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         Call<List<Item>> call = apiService.getItems(currentToken);
@@ -113,7 +79,7 @@ public class HomeFragment extends Fragment {
             public void onResponse(Call<List<Item>> call, Response<List<Item>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     itemList = response.body();
-                    itemAdapter = new ItemAdapter(itemList);
+                    itemAdapter = new ItemAdapter(itemList, getContext());
                     recyclerView.setAdapter(itemAdapter);
                 } else {
                     try {
@@ -129,7 +95,6 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<Item>> call, Throwable t) {
-                //Toast.makeText(getContext(), "An error occurred. Please try again.", Toast.LENGTH_SHORT).show();
                 Log.e("API_ERROR", "Request failed: " + t.getMessage());
                 Toast.makeText(getContext(), "Request failed", Toast.LENGTH_SHORT).show();
             }

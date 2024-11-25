@@ -8,6 +8,7 @@ material = "1.12.0"
 constraintlayout = "2.1.4"
 lifecycleLivedataKtx = "2.8.6"
 lifecycleViewmodelKtx = "2.8.6"
+midtransVersion = "2.3.0-SANDBOX"
 navigationFragment = "2.8.3"
 navigationUi = "2.8.3"
 relexCircleindicatorVersion = "2.1.6"
@@ -27,6 +28,7 @@ lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-view
 navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
 navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "navigationUi" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofitVersion" }
+uikit = { module = "com.midtrans:uikit", version.ref = "midtransVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

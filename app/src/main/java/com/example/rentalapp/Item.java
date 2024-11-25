@@ -1,6 +1,7 @@
 package com.example.rentalapp;
 
 public class Item {
+    private int id;
     private String name;
     private String category;
     private String description;
@@ -9,7 +10,8 @@ public class Item {
     private String status;
     private int lenderId;
 
-    public Item(String name, String category, String description, double price, int minimumRent, String status, int lenderId) {
+    public Item(int id, String name, String category, String description, double price, int minimumRent, String status, int lenderId) {
+        this.id = id;
         this.name = name;
         this.category = category;
         this.description = description;
@@ -17,6 +19,10 @@ public class Item {
         this.minimumRent = minimumRent;
         this.status = status;
         this.lenderId =lenderId;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getName() {

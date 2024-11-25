@@ -1,10 +1,12 @@
 package com.example.rentalapp.API;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Path;
 
 import com.example.rentalapp.Item;
 import com.example.rentalapp.Models.ServerResponse;
@@ -23,4 +25,14 @@ public interface ApiService {
 
     @GET("items")
     Call<List<Item>> getItems(@Header("Authorization") String token);
+
+    @GET("items/{id}")
+    Call<Item> getItemDetails(@Path("id") String id);
+
+    @POST("rent/item/{id}")
+    Call<ResponseBody> initiateRent(
+            @Header("Authorization") String token,
+            @Path("id") int itemId
+    );
+
 }

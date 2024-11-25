@@ -36,6 +36,7 @@ android {
 
 dependencies {
 
+    implementation(libs.uikit)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.circleindicator)
