@@ -1,4 +1,4 @@
-package com.example.rentalapp;
+package com.example.rentalapp.Models;
 
 public class Item {
     private int id;

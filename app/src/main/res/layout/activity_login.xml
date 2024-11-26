@@ -124,6 +124,22 @@
         app:layout_constraintWidth_percent="0.9"
         app:cornerRadius="20dp"/>
 
+    <Button
+        android:id="@+id/login_guest_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="84dp"
+        android:background="@drawable/rounded_button"
+        android:backgroundTint="#00BCD4"
+        android:text="Guest Account"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        app:cornerRadius="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/remember_me"
+        app:layout_constraintWidth_percent="0.9" />
+
     <TextView
         android:id="@+id/getting_token"
         android:layout_width="wrap_content"

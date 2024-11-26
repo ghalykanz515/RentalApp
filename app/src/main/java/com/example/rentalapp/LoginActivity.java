@@ -28,6 +28,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView linkSignup;
     private CheckBox rememberMeCheckBox;
     private Button loginButton;
+    private Button loginGuestButton;
 
     private ProgressDialog progressDialog;
 
@@ -41,6 +42,7 @@ public class LoginActivity extends AppCompatActivity {
         passwordInput = findViewById(R.id.password_input);
         rememberMeCheckBox = findViewById(R.id.remember_me);
         loginButton = findViewById(R.id.login_button);
+        loginGuestButton = findViewById(R.id.login_guest_button);
 
         linkSignup.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
@@ -62,6 +64,12 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        loginGuestButton.setOnClickListener(v -> {
+            String username = "ghaly@gmail.com";
+            String password = "ghaly123";
+
+            login(username, password);
+        });
     }
 
     private void login(String username, String password) {

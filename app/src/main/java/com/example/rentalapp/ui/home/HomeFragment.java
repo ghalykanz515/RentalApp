@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
@@ -17,7 +16,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.example.rentalapp.API.ApiClient;
 import com.example.rentalapp.API.ApiService;
 import com.example.rentalapp.BannerAdapter;
-import com.example.rentalapp.Item;
+import com.example.rentalapp.Models.Item;
 import com.example.rentalapp.ItemAdapter;
 import com.example.rentalapp.R;
 import com.example.rentalapp.databinding.FragmentHomeBinding;

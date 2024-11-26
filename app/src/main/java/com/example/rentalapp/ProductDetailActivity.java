@@ -1,10 +1,8 @@
 package com.example.rentalapp;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,13 +11,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.rentalapp.API.ApiClient;
 import com.example.rentalapp.API.ApiService;
+import com.example.rentalapp.Models.Item;
+import com.example.rentalapp.Models.RentalResponse;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 
-import java.io.IOException;
-
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -52,18 +54,12 @@ public class ProductDetailActivity extends AppCompatActivity {
             return;
         }
 
-        rentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                initiateRent(itemId);
-            }
-        });
+        rentButton.setOnClickListener(v -> initiateRent(itemId));
     }
 
     private void fetchItemDetails(String itemId) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
 
-        // Retrieve token from SharedPreferences
         String token = getSharedPreferences("user_data", Context.MODE_PRIVATE)
                 .getString("token", "");
 
@@ -76,11 +72,6 @@ public class ProductDetailActivity extends AppCompatActivity {
         call.enqueue(new Callback<Item>() {
             @Override
             public void onResponse(Call<Item> call, Response<Item> response) {
-
-                // To Check if its authorize
-                Log.d("API_RESPONSE", "Status Code: " + response.code());
-                Log.d("API_RESPONSE", "Raw Response: " + response.raw());
-
                 if (response.isSuccessful() && response.body() != null) {
                     Item item = response.body();
                     itemName.setText(item.getName());
@@ -103,7 +94,6 @@ public class ProductDetailActivity extends AppCompatActivity {
     private void initiateRent(String itemId) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
 
-        // Get user token from SharedPreferences
         String token = getSharedPreferences("user_data", Context.MODE_PRIVATE)
                 .getString("token", "");
         Log.d("TOKEN_DEBUG", "Token: " + token);
@@ -115,41 +105,50 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         try {
             int parsedItemId = Integer.parseInt(itemId);
-            Call<ResponseBody> call = apiService.initiateRent("Bearer " + token, parsedItemId);
 
-            call.enqueue(new Callback<ResponseBody>() {
+            // Prepare rent request with MySQL compatible date format
+//            String startDate = getCurrentDateInMySQLFormat();
+//            String endDate = getFutureDateInMySQLFormat(7);
+
+            String startDate = getCurrentDate();
+            String endDate = getFutureDate(7);
+
+            Map<String, String> rentRequest = new HashMap<>();
+            rentRequest.put("startDate", startDate);
+            rentRequest.put("endDate", endDate);
+
+            Call<RentalResponse> call = apiService.initiateRent("Bearer " + token, parsedItemId, rentRequest);
+
+            Log.d("RENT_REQUEST", "Token: " + token);
+            Log.d("RENT_REQUEST", "Item ID: " + itemId);
+            Log.d("RENT_REQUEST", "Start Date: " + startDate);
+            Log.d("RENT_REQUEST", "End Date: " + endDate);
+            Log.d("RENT_REQUEST_BODY", "Request Body: " + rentRequest.toString());
+
+            call.enqueue(new Callback<RentalResponse>() {
                 @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    Log.d("API_RESPONSE", "Status Code: " + response.code());
-                    Log.d("API_RESPONSE", "Raw Response: " + response.raw());
-
+                public void onResponse(Call<RentalResponse> call, Response<RentalResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
-                        try {
-                            String responseBody = response.body().string();
-                            JSONObject jsonObject = new JSONObject(responseBody);
-                            String paymentUrl = jsonObject.getString("paymentUrl");
-
-                            // Open WebView for payment
-                            openPaymentWebView(paymentUrl);
-                        } catch (IOException | JSONException e) {
-                            Log.e("PARSING_ERROR", "Failed to parse response: " + e.getMessage());
-                            Toast.makeText(ProductDetailActivity.this, "Failed to parse response.", Toast.LENGTH_SHORT).show();
-                        }
+                        RentalResponse rentalResponse = response.body();
+                        String paymentUrl = rentalResponse.getPaymentUrl();
+                        openPaymentWebView(paymentUrl);
                     } else {
+                        Log.e("API_ERROR", "Response failed: " + response.code() + " - " + response.message());
                         try {
-                            String errorBody = response.errorBody() != null ? response.errorBody().string() : "No error details";
-                            Log.e("API_ERROR", "Response failed: " + errorBody);
-                            Toast.makeText(ProductDetailActivity.this, "Failed to initiate rent: " + response.message(), Toast.LENGTH_SHORT).show();
-                        } catch (IOException e) {
-                            Log.e("API_ERROR", "Failed to read error body: " + e.getMessage());
+                            if (response.errorBody() != null) {
+                                Log.e("API_ERROR_BODY", response.errorBody().string());
+                            }
+                        } catch (Exception e) {
+                            Log.e("API_ERROR_BODY", "Error reading error body", e);
                         }
+                        Toast.makeText(ProductDetailActivity.this, "Failed to initiate rent: " + response.code(), Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                public void onFailure(Call<RentalResponse> call, Throwable t) {
                     Log.e("API_ERROR", "Request failed: " + t.getMessage());
-                    Toast.makeText(ProductDetailActivity.this, "Request failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProductDetailActivity.this, "Request failed.", Toast.LENGTH_SHORT).show();
                 }
             });
         } catch (NumberFormatException e) {
@@ -158,7 +157,211 @@ public class ProductDetailActivity extends AppCompatActivity {
         }
     }
 
+    private String getCurrentDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return sdf.format(new Date());
+    }
+
+    private String getFutureDate(int daysToAdd) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, daysToAdd);
+        return sdf.format(calendar.getTime());
+    }
+
+    private String getCurrentDateInMySQLFormat() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return sdf.format(new Date());
+    }
+
+    private String getFutureDateInMySQLFormat(int daysToAdd) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, daysToAdd); // Adds days correctly
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(calendar.getTime());
+    }
+
     private void openPaymentWebView(String paymentUrl) {
         WebViewActivity.start(this, paymentUrl);
     }
 }
+
+
+
+
+//package com.example.rentalapp;
+//
+//import android.content.Context;
+//import android.os.Bundle;
+//import android.util.Log;
+//import android.widget.Button;
+//import android.widget.TextView;
+//import android.widget.Toast;
+//
+//import androidx.appcompat.app.AppCompatActivity;
+//
+//import com.example.rentalapp.API.ApiClient;
+//import com.example.rentalapp.API.ApiService;
+//import com.example.rentalapp.Models.Item;
+//import com.example.rentalapp.Models.RentalResponse;
+//
+//import java.text.SimpleDateFormat;
+//import java.util.Calendar;
+//import java.util.Date;
+//import java.util.HashMap;
+//import java.util.Locale;
+//import java.util.Map;
+//import java.util.TimeZone;
+//
+//import retrofit2.Call;
+//import retrofit2.Callback;
+//import retrofit2.Response;
+//
+//public class ProductDetailActivity extends AppCompatActivity {
+//
+//    private TextView itemName, itemDescription, itemPrice;
+//    private Button rentButton;
+//    private String itemId;
+//
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_product_detail);
+//
+//        // Initialize views
+//        itemName = findViewById(R.id.productTitle);
+//        itemDescription = findViewById(R.id.productDescription);
+//        itemPrice = findViewById(R.id.productPrice);
+//        rentButton = findViewById(R.id.rentButton);
+//
+//        // Get item ID from Intent
+//        itemId = getIntent().getStringExtra("ITEM_ID");
+//        Log.d("ProductDetailActivity", "ITEM_ID received: " + itemId);
+//
+//        if (itemId != null) {
+//            fetchItemDetails(itemId);
+//        } else {
+//            Toast.makeText(this, "No item selected", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        rentButton.setOnClickListener(v -> initiateRent(itemId));
+//    }
+//
+//    private void fetchItemDetails(String itemId) {
+//        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+//
+//        String token = getSharedPreferences("user_data", Context.MODE_PRIVATE)
+//                .getString("token", "");
+//
+//        if (token.isEmpty()) {
+//            Toast.makeText(this, "No token found. Please log in again.", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        Call<Item> call = apiService.getItemDetails("Bearer " + token, itemId);
+//        call.enqueue(new Callback<Item>() {
+//            @Override
+//            public void onResponse(Call<Item> call, Response<Item> response) {
+//                if (response.isSuccessful() && response.body() != null) {
+//                    Item item = response.body();
+//                    itemName.setText(item.getName());
+//                    itemDescription.setText(item.getDescription());
+//                    itemPrice.setText(String.valueOf(item.getPrice()));
+//                } else {
+//                    Log.e("API_ERROR", "Response failed: " + response.message());
+//                    Toast.makeText(ProductDetailActivity.this, "Failed to load item details", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<Item> call, Throwable t) {
+//                Log.e("API_FAILURE", "Error: " + t.getMessage());
+//                Toast.makeText(ProductDetailActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
+//
+//    private void initiateRent(String itemId) {
+//        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+//
+//        String token = getSharedPreferences("user_data", Context.MODE_PRIVATE)
+//                .getString("token", "");
+//        Log.d("TOKEN_DEBUG", "Token: " + token);
+//
+//        if (token.isEmpty()) {
+//            Toast.makeText(this, "No token found. Please login again.", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        try {
+//            int parsedItemId = Integer.parseInt(itemId);
+//
+//            // Prepare rent request with startDate and endDate
+//            String startDate = getCurrentDate();
+//            String endDate = getFutureDate(7);
+//            Map<String, String> rentRequest = new HashMap<>();
+//            rentRequest.put("startDate", startDate);
+//            rentRequest.put("endDate", endDate);
+//
+//            Call<RentalResponse> call = apiService.initiateRent("Bearer " + token, parsedItemId, rentRequest);
+//
+//            Log.d("RENT_REQUEST", "Token: " + token);
+//            Log.d("RENT_REQUEST", "Item ID: " + itemId);
+//            Log.d("RENT_REQUEST", "Start Date: " + startDate);
+//            Log.d("RENT_REQUEST", "End Date: " + endDate);
+//
+//            call.enqueue(new Callback<RentalResponse>() {
+//                @Override
+//                public void onResponse(Call<RentalResponse> call, Response<RentalResponse> response) {
+//                    if (response.isSuccessful() && response.body() != null) {
+//                        RentalResponse rentalResponse = response.body();
+//                        String paymentUrl = rentalResponse.getPaymentUrl();
+//                        openPaymentWebView(paymentUrl);
+//                    } else {
+//                        Log.e("API_ERROR", "Response failed: " + response.code() + " - " + response.message());
+//                        try {
+//                            // Log response error body for more details
+//                            if (response.errorBody() != null) {
+//                                Log.e("API_ERROR_BODY", response.errorBody().string());
+//                            }
+//                        } catch (Exception e) {
+//                            Log.e("API_ERROR_BODY", "Error reading error body", e);
+//                        }
+//                        Toast.makeText(ProductDetailActivity.this, "Failed to initiate rent: " + response.code(), Toast.LENGTH_SHORT).show();
+//                    }
+//                }
+//
+//
+//                @Override
+//                public void onFailure(Call<RentalResponse> call, Throwable t) {
+//                    Log.e("API_ERROR", "Request failed: " + t.getMessage());
+//                    Toast.makeText(ProductDetailActivity.this, "Request failed.", Toast.LENGTH_SHORT).show();
+//                }
+//            });
+//        } catch (NumberFormatException e) {
+//            Log.e("ID_PARSING_ERROR", "Invalid item ID: " + itemId);
+//            Toast.makeText(this, "Invalid item ID.", Toast.LENGTH_SHORT).show();
+//        }
+//    }
+//
+//    private String getCurrentDate() {
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+//        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+//        return sdf.format(new Date());
+//    }
+//
+//    private String getFutureDate(int daysToAdd) {
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+//        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.add(Calendar.DAY_OF_YEAR, daysToAdd);
+//        return sdf.format(calendar.getTime());
+//    }
+//
+//    private void openPaymentWebView(String paymentUrl) {
+//        WebViewActivity.start(this, paymentUrl);
+//    }
+//}
