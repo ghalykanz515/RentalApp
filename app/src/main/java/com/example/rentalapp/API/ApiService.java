@@ -8,6 +8,8 @@ import retrofit2.http.Header;
 import retrofit2.http.Path;
 
 import com.example.rentalapp.Models.Item;
+import com.example.rentalapp.Models.RentLengthRequest;
+import com.example.rentalapp.Models.RentRequest;
 import com.example.rentalapp.Models.RentalResponse;
 import com.example.rentalapp.Models.ServerResponse;
 import com.example.rentalapp.Models.LoginRequest;
@@ -35,7 +37,7 @@ public interface ApiService {
     Call<RentalResponse> initiateRent(
             @Header("Authorization") String token,
             @Path("id") int itemId,
-            @Body Map<String, String> rentRequest // Pass startDate and endDate in request body
+            @Body RentLengthRequest rentRequest // Pass rentLength in request body
     );
 
 
