@@ -1,19 +1,13 @@
 package com.example.rentalapp.Models;
 
-import com.google.gson.annotations.SerializedName;
-
 public class RentalResponse {
 
-    @SerializedName("message")
     private String message;
 
-    @SerializedName("orderId")
     private String orderId;
 
-    @SerializedName("snapToken")
     private String snapToken;
 
-    @SerializedName("paymentUrl")
     private String paymentUrl;
 
     // Getters

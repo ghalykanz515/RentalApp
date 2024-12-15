@@ -9,14 +9,13 @@ import retrofit2.http.Path;
 
 import com.example.rentalapp.Models.Item;
 import com.example.rentalapp.Models.RentLengthRequest;
-import com.example.rentalapp.Models.RentRequest;
 import com.example.rentalapp.Models.RentalResponse;
 import com.example.rentalapp.Models.ServerResponse;
 import com.example.rentalapp.Models.LoginRequest;
 import com.example.rentalapp.Models.SignUpRequest;
+import com.example.rentalapp.Models.RentHistoryResponse;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ApiService {
 
@@ -37,8 +36,12 @@ public interface ApiService {
     Call<RentalResponse> initiateRent(
             @Header("Authorization") String token,
             @Path("id") int itemId,
-            @Body RentLengthRequest rentRequest // Pass rentLength in request body
+            @Body RentLengthRequest rentRequest
     );
 
+//    @GET("rent/history")
+//    Call<List<RentHistory>> getRentHistory(@Header("Authorization") String token);  // Added this endpoint
 
+    @GET("rent/history")
+    Call<RentHistoryResponse> getRentHistory(@Header("Authorization") String token);
 }

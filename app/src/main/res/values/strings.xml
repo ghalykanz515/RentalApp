@@ -10,5 +10,6 @@
     <string name="menu_home">Home</string>
     <string name="menu_search">Search</string>
     <string name="menu_notification">Notifications</string>
+    <string name="menu_rent_history">Rent History</string>
     <string name="menu_mypage">My Page</string>
 </resources>

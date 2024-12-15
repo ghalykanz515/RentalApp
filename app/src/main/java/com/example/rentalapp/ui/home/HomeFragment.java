@@ -15,9 +15,9 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.rentalapp.API.ApiClient;
 import com.example.rentalapp.API.ApiService;
-import com.example.rentalapp.BannerAdapter;
+import com.example.rentalapp.Adapters.BannerAdapter;
 import com.example.rentalapp.Models.Item;
-import com.example.rentalapp.ItemAdapter;
+import com.example.rentalapp.Adapters.ItemAdapter;
 import com.example.rentalapp.R;
 import com.example.rentalapp.databinding.FragmentHomeBinding;
 
@@ -55,7 +55,6 @@ public class HomeFragment extends Fragment {
 
         // Set up the banner
         setupBanner();
-
 
         // Initialize item list
         itemList = new ArrayList<>();

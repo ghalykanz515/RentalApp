@@ -24,6 +24,12 @@
         tools:layout="@layout/fragment_slideshow" />
 
     <fragment
+        android:id="@+id/nav_rent_history"
+        android:name="com.example.rentalapp.ui.history.RentHistoryFragment"
+        android:label="@string/menu_rent_history"
+        tools:layout="@layout/fragment_rent_history" />
+
+    <fragment
         android:id="@+id/nav_mypage"
         android:name="com.example.rentalapp.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_mypage"

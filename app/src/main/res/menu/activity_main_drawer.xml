@@ -17,6 +17,10 @@
             android:icon="@drawable/notification_icon"
             android:title="@string/menu_notification" />
         <item
+            android:id="@+id/nav_rent_history"
+            android:icon="@drawable/clipboard_list_solid"
+            android:title="@string/menu_rent_history" />
+        <item
             android:id="@+id/nav_mypage"
             android:icon="@drawable/user_icon"
             android:title="@string/menu_mypage" />

@@ -123,6 +123,7 @@ public class ProductDetailActivity extends AppCompatActivity {
                         } catch (Exception e) {
                             Log.e("API_ERROR_BODY", "Error reading error body", e);
                         }
+
                         Toast.makeText(ProductDetailActivity.this, "Failed to initiate rent: " + response.code(), Toast.LENGTH_SHORT).show();
                     }
                 }

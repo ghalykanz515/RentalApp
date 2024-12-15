@@ -1,4 +1,4 @@
-package com.example.rentalapp;
+package com.example.rentalapp.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.rentalapp.Models.Item;
+import com.example.rentalapp.ProductDetailActivity;
+import com.example.rentalapp.R;
 
 import java.util.List;
 
